@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.booksavvy.server.dto.book.BookCategoryResponse;
 import com.booksavvy.server.dto.common.Response;
 import com.booksavvy.server.entity.Book;
 import com.booksavvy.server.service.BookService;
@@ -17,9 +18,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
-@RequestMapping("/v1/book")
+@RequestMapping("api/v1/book")
 @Validated
 public class BookController {
+    
     @Autowired
     private final BookService bookService;
 
@@ -41,6 +43,15 @@ public class BookController {
         Optional<Book> book = bookService.getBook(Long.parseLong(id));
         
         Response response = new Response("success", "success", "success", book);
+
+        return response;
+    }
+    
+    @GetMapping("/category")
+    public Response getBookCategory() {
+        List<BookCategoryResponse> bookCategories = bookService.getBookCategories();
+        
+        Response response = new Response("success", "success", "success", bookCategories);
 
         return response;
     }

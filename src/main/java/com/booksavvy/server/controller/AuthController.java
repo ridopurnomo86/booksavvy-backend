@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("api/v1/auth")
 @Validated
 public class AuthController {
 
