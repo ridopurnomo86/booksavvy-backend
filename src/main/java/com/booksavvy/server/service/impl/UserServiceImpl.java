@@ -1,6 +1,7 @@
 package com.booksavvy.server.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.booksavvy.server.entity.User;
@@ -14,7 +15,6 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class UserServiceImpl implements UserService {
     
-    @Autowired
     private final UserRepository userRepository;
 
     public UserServiceImpl(UserRepository userRepository) {
@@ -31,5 +31,9 @@ public class UserServiceImpl implements UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public Optional<User> findByUserId(Long id) {
+        return userRepository.findById(id);
     }
 }

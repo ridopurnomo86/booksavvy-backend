@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.booksavvy.server.config.RedisConfig;
 import com.booksavvy.server.dto.book.BookCategoryResponse;
 import com.booksavvy.server.entity.Book;
 import com.booksavvy.server.repository.BookCategoriesRepository;
@@ -19,11 +19,11 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class BookServiceImpl implements BookService {
 
-    @Autowired
     private final BookRepository bookRepository;
     private final BookCategoriesRepository bookCategoriesRepository;
 
-    public BookServiceImpl(BookRepository bookRepository, BookCategoriesRepository bookCategoriesRepository) {
+
+    public BookServiceImpl(BookRepository bookRepository, RedisConfig redisConfig, BookCategoriesRepository bookCategoriesRepository) {
         this.bookRepository = bookRepository;
         this.bookCategoriesRepository = bookCategoriesRepository;
     }

@@ -1,4 +1,4 @@
-package com.booksavvy.server.provider;
+package com.booksavvy.server.security;
 
 import java.util.Date;
 import java.util.Map;
@@ -6,10 +6,12 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -24,6 +26,11 @@ public class JwtTokenProvider {
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
     }
 
     public String generateToken(Map<String, Object> data) {
@@ -50,6 +57,12 @@ public class JwtTokenProvider {
         }
     }
 
+    public Claims parseToken(String token) {
+        Claims claims = (Claims) Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parse(token).getBody();
+
+        return claims;
+    }
+
     public boolean isExpired(String token) {
         return Jwts.parserBuilder()
         .setSigningKey(getSigningKey())
@@ -59,4 +72,5 @@ public class JwtTokenProvider {
         .getExpiration()
         .before(new Date());
     }
+
 }

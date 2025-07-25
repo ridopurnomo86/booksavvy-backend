@@ -3,7 +3,6 @@ package com.booksavvy.server.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/v1/auth")
-@Validated
 public class AuthController {
 
     @Autowired
@@ -36,10 +34,12 @@ public class AuthController {
     public ResponseEntity<Response> login(@Valid @RequestBody LoginRequest auth, HttpServletResponse response) {
         AuthResponse authResponse = authService.login(response,auth);
 
+        String token = authResponse.getToken();
+
         Response responseData = new Response("success", "success", "success", authResponse);
         
         return ResponseEntity.status(HttpStatus.OK)
-        .header("Authorization",  "Bearer " + authResponse.getToken())
+        .header("Authorization",  "Bearer " + token)
         .body(responseData);
     }
     
