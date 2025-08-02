@@ -1,7 +1,7 @@
 package com.booksavvy.server.service.impl;
 
-import java.util.Optional;
 
+import com.booksavvy.server.dto.user.UserResponse;
 import org.springframework.stereotype.Service;
 
 import com.booksavvy.server.entity.User;
@@ -33,7 +33,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public Optional<User> findByUserId(Long id) {
-        return userRepository.findById(id);
+    public UserResponse findByUserId(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("id" + id));
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setEmail(user.getEmail());
+        userResponse.setId(user.getId());
+        userResponse.setName(user.getName());
+        userResponse.setLastLogin(user.getLastLogin());
+
+        return userResponse;
     }
+
 }

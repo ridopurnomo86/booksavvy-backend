@@ -19,7 +19,7 @@ import java.security.Key;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
+    @Value("${JWT_SECRET}")
     private String jwtSecret;
 
     private final long validityInMiliseconds = 3600000; // 1hr
