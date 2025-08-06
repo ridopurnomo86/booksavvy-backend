@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 public class CookieServiceImpl implements CookieService {
+
+    @Override
     public void setCookie(HttpServletResponse response, String name, String value) {
         Cookie cookie = new Cookie(name, value);
         cookie.setMaxAge(CookieConfig.COOKIE_MAX_AGE);
@@ -24,6 +26,8 @@ public class CookieServiceImpl implements CookieService {
         response.addCookie(cookie);
     }
 
+
+    @Override
     public Optional<String> getCookie(HttpServletRequest request, String name) {
         if (request.getCookies() == null) return Optional.empty();
         
@@ -36,6 +40,8 @@ public class CookieServiceImpl implements CookieService {
         return Optional.empty();
     }
 
+
+    @Override
     public void clearCookie(HttpServletResponse response, String name) {
         Cookie cookie = new Cookie(name, null);
         cookie.setPath("/");

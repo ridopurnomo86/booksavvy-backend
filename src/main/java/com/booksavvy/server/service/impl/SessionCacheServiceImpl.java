@@ -1,12 +1,11 @@
 package com.booksavvy.server.service.impl;
-import java.time.Duration;
 
+import com.booksavvy.server.service.SessionCacheService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.booksavvy.server.service.SessionCacheService;
-
-import jakarta.transaction.Transactional;
+import java.time.Duration;
 
 @Service
 @Transactional
@@ -17,22 +16,26 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     public SessionCacheServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
-    
-    public void saveLastLogin(Long userId, String timestamp) {
+
+    @Override
+    public void saveSessionCache(Long userId, String timestamp, String token) {
         String key = "session:user:" + userId;
 
         redisTemplate.opsForHash().put(key, "lastLogin", timestamp);
+        redisTemplate.opsForHash().put(key, "token", token);
 
-        redisTemplate.expire(key, Duration.ofHours(24));
+        redisTemplate.expire(key, Duration.ofHours(6));
     }
 
-    public String getLastLogin(Long userId) {
+    @Override
+    public String getSessionTokenCache(Long userId) {
         String key = "session:user:" + userId;
 
-        return (String) redisTemplate.opsForHash().get(key, "lastLogin");
+        return (String) redisTemplate.opsForHash().get(key, "token");
     }
 
-    public void removeLastLogin(Long userId) {
+    @Override
+    public void deleteSessionCache(Long userId) {
         String key = "session:user:" + userId;
 
         redisTemplate.opsForHash().delete(key, "lastLogin");

@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setLastLogin(LocalDateTime.now());
 
-        sessionCacheService.saveLastLogin(user.getId(), timestamp);
+        sessionCacheService.saveSessionCache(user.getId(), timestamp, token);
 
         return new AuthResponse(token, "Bearer", user.getEmail());
     }
@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
 
         if (!verify) throw new BadCredentialsException("invalid Credential");
 
-        return verify;
+        return true;
     }
 
     @Override

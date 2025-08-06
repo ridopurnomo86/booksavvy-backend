@@ -1,20 +1,16 @@
 package com.booksavvy.server.security;
 
-import java.util.Date;
-import java.util.Map;
-
+import com.booksavvy.server.exception.TokenExpiredException;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -22,20 +18,23 @@ public class JwtTokenProvider {
     @Value("${JWT_SECRET}")
     private String jwtSecret;
 
-    private final long validityInMiliseconds = 3600000; // 1hr
-
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String resolveToken(HttpServletRequest request) {
         String bearer = request.getHeader("Authorization");
-        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+
+        if (bearer != null && bearer.startsWith("Bearer ")) return bearer.substring(7);
+
+        throw new JwtException("");
     }
 
     public String generateToken(Map<String, Object> data) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMiliseconds);
+
+        long validityInMillisecond = 21600000; // 6hr
+        Date expiry = new Date(now.getTime() + validityInMillisecond);
 
         return Jwts.builder()
         .setClaims(data)
@@ -53,14 +52,22 @@ public class JwtTokenProvider {
             .parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new JwtException("Invalid Token");
         }
     }
 
     public Claims parseToken(String token) {
-        Claims claims = (Claims) Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parse(token).getBody();
-
-        return claims;
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException err) {
+            throw new TokenExpiredException("Token expired at: " + err.getClaims().getExpiration());
+        } catch (JwtException err) {
+            throw new JwtException("Invalid Token", err);
+        }
     }
 
     public boolean isExpired(String token) {

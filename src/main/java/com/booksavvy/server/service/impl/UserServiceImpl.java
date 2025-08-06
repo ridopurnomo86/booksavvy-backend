@@ -2,14 +2,12 @@ package com.booksavvy.server.service.impl;
 
 
 import com.booksavvy.server.dto.user.UserResponse;
-import org.springframework.stereotype.Service;
-
 import com.booksavvy.server.entity.User;
 import com.booksavvy.server.exception.UserNotFoundException;
 import com.booksavvy.server.repository.UserRepository;
 import com.booksavvy.server.service.UserService;
-
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
@@ -21,18 +19,22 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+    @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("email" + email));
     }
 
+    @Override
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
+    @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    @Override
     public UserResponse findByUserId(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("id" + id));
 

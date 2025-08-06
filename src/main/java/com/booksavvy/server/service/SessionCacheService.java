@@ -1,7 +1,7 @@
 package com.booksavvy.server.service;
 
 public interface SessionCacheService {
-    void saveLastLogin(Long userId, String timestamp);
-    String getLastLogin(Long userId);
-    void removeLastLogin(Long userId);
+    void saveSessionCache(Long userId, String timestamp, String token);
+    String getSessionTokenCache(Long userId);
+    void deleteSessionCache(Long userId);
 }
