@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.booksavvy.server.dto.user.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -96,7 +98,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(HttpServletResponse response) {
+    public void logout(Long userId, HttpServletResponse response) {
+        sessionCacheService.deleteSessionCache(userId);
+
         cookieService.clearCookie(response, cookieAuthName);
     }
 }

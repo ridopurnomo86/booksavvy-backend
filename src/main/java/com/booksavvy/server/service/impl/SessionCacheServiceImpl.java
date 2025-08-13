@@ -38,6 +38,6 @@ public class SessionCacheServiceImpl implements SessionCacheService {
     public void deleteSessionCache(Long userId) {
         String key = "session:user:" + userId;
 
-        redisTemplate.opsForHash().delete(key, "lastLogin");
+        redisTemplate.delete(key);
     }
 }

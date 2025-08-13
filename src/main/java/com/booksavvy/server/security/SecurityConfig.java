@@ -17,17 +17,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
     private final SessionCacheService sessionCacheService;
 
 
     public SecurityConfig(
             JwtTokenProvider jwtTokenProvider,
-            UserService userService,
             SessionCacheService sessionCacheService
     ) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.userService = userService;
         this.sessionCacheService = sessionCacheService;
     }
 
@@ -47,7 +44,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/book").permitAll()
                 .anyRequest()
                 .authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userService, sessionCacheService), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, sessionCacheService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

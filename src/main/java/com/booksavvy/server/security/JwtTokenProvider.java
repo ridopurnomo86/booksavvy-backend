@@ -1,6 +1,5 @@
 package com.booksavvy.server.security;
 
-import com.booksavvy.server.exception.TokenExpiredException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,7 +63,7 @@ public class JwtTokenProvider {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException err) {
-            throw new TokenExpiredException("Token expired at: " + err.getClaims().getExpiration());
+            throw err;
         } catch (JwtException err) {
             throw new JwtException("Invalid Token", err);
         }

@@ -18,15 +18,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserService userService;
     private final SessionCacheService sessionCacheService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserService userService, SessionCacheService sessionCacheService) {
-        this.userService = userService;
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, SessionCacheService sessionCacheService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.sessionCacheService = sessionCacheService;
     }
@@ -40,31 +39,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = jwtTokenProvider.resolveToken(request);
 
-            if (jwtTokenProvider.validateToken(token)) {
-                Claims parseToken = jwtTokenProvider.parseToken(token);
+            Claims parseToken = jwtTokenProvider.parseToken(token);
 
-                System.out.println(parseToken);
-
-                Long userId = new Long((Integer) parseToken.get("user_id"));
-
-                String tokenSessionCache = sessionCacheService.getSessionTokenCache(userId);
-
-                System.out.println(tokenSessionCache);
-
-                UserResponse user = userService.findByUserId(userId);
-
-                UserResponse userResponse = new UserResponse();
-                userResponse.setId(user.getId());
-                userResponse.setEmail(user.getEmail());
-
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userResponse, null, List.of());
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (token == null || token.isEmpty()) {
+                filterChain.doFilter(request, response);
+                return;
             }
 
+            Long userId = parseToken.get("user_id") instanceof Number ? ((Number) parseToken.get("user_id")).longValue() : null;
+
+            String tokenSessionCache = sessionCacheService.getSessionTokenCache(userId);
+
+            if (!Objects.equals(token, tokenSessionCache)) throw new JwtException("Invalid Token");
+
+            UserResponse userResponse = new UserResponse();
+            userResponse.setId(userId);
+            userResponse.setEmail((String) parseToken.get("email"));
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userResponse, null, List.of());
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
             filterChain.doFilter(request, response);
+
         } catch (ExpiredJwtException err) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -79,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return path.startsWith("/api/v1/auth/");
+        return path.startsWith("/api/v1/auth/login") || path.startsWith("/api/v1/auth/register");
     }
 
 }

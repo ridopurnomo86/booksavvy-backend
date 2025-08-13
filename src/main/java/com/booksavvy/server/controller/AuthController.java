@@ -1,8 +1,11 @@
 package com.booksavvy.server.controller;
 
+import com.booksavvy.server.dto.user.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/v1/auth")
+@Validated
 public class AuthController {
 
     @Autowired
@@ -53,8 +57,9 @@ public class AuthController {
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<Response> logout(HttpServletResponse response) {
-        authService.logout(response);
+    public ResponseEntity<Response> logout(@AuthenticationPrincipal UserResponse user,HttpServletResponse response) {
+
+        authService.logout(user.getId(),response);
                
         Response responseData = new Response("success", "success", "success");
         
