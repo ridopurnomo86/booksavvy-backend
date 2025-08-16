@@ -26,7 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private final String cookieAuthName = "access_token";

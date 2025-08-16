@@ -2,7 +2,6 @@ package com.booksavvy.server.service.impl;
 
 import com.booksavvy.server.service.RedisService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@Transactional
 public class RedisServiceImpl implements RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;

@@ -16,7 +16,6 @@ import com.booksavvy.server.service.BookService;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
@@ -29,12 +28,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public List<Book> getBooks() {
         List<Book> books = bookRepository.findAll();
         return books;
     }
 
     @Override
+    @Transactional
     public Optional<Book> getBook(Long id) {
         Optional<Book> book = bookRepository.findById(id);
 
@@ -44,6 +45,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public List<BookCategoryResponse> getBookCategories() {
         List<BookCategoryResponse> categories = bookCategoriesRepository.findAll().stream().map(category -> new BookCategoryResponse(category.getId(), category.getName())).collect(Collectors.toList());
         

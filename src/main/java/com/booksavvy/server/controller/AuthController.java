@@ -1,6 +1,8 @@
 package com.booksavvy.server.controller;
 
 import com.booksavvy.server.dto.user.UserResponse;
+import com.booksavvy.server.service.RateLimiterService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,21 +23,25 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.Duration;
+
 
 @RestController
 @RequestMapping("api/v1/auth")
 @Validated
 public class AuthController {
-
-    @Autowired
     private final AuthService authService;
+    private final RateLimiterService rateLimiterService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, RateLimiterService rateLimiterService) {
         this.authService = authService;
+        this.rateLimiterService = rateLimiterService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Response> login(@Valid @RequestBody LoginRequest auth, HttpServletResponse response) {
+    public ResponseEntity<Response> login(@Valid @RequestBody LoginRequest auth, HttpServletResponse response, HttpServletRequest request) {
+        rateLimiterService.isAllowed(request,10, Duration.ofHours(1));
+
         AuthResponse authResponse = authService.login(response,auth);
 
         String token = authResponse.getToken();

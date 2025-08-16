@@ -10,7 +10,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
 public class UserServiceImpl implements UserService {
     
     private final UserRepository userRepository;
@@ -20,21 +19,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("email" + email));
     }
 
     @Override
+    @Transactional
     public User saveUser(User user) {
         return userRepository.save(user);
     }
 
     @Override
+    @Transactional
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
     @Override
+    @Transactional
     public UserResponse findByUserId(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("id" + id));
 

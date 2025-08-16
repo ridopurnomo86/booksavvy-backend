@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional
 public class CookieServiceImpl implements CookieService {
 
     @Override

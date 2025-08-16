@@ -1,14 +1,12 @@
 package com.booksavvy.server.service.impl;
 
 import com.booksavvy.server.service.SessionCacheService;
-import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
 @Service
-@Transactional
 public class SessionCacheServiceImpl implements SessionCacheService {
 
     private final RedisTemplate<String, Object> redisTemplate;
